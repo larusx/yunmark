@@ -16,6 +16,7 @@ libraries:
 - name: "misaka"
   version: "1.0.2"
 handlers:
+
 - url: /static/
   static_path: static
   gzip: on
