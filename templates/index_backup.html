@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% block body %}
+<div ng-app="myApp" ng-controller="TodoCtrl" ng-init="listByTag=['all']" ng-cloak
+     style="background-color: rgb(245, 245, 245)" xmlns="http://www.w3.org/1999/html">
+    <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header" ng-mousemove="Title='Logout'" ng-mouseleave="Title='YunMark'"
+                 ng-init="Title='YunMark'">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-01">
+                    <span class="sr-only">Toggle navigation</span>
+                </button>
+                <a class="navbar-brand" href="/{{Title|lowercase}}">{{Title}}</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="navbar-collapse-01">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a class="navbar-text" data-toggle="modal" data-target="#markdown-help" href="#">Markdown手册
+                        </a></li>
+                    <li>
+                        <a class="navbar-text" data-toggle="modal" data-target="#announcement" href="#">抢先知道!</a>
+                    </li>
+                </ul>
+                <a class="navbar-text" href="/share">所有人分享</a>
+                <a class="navbar-text" target="_blank" href="https://coding.net/pp">coding冒泡</a>
+                <a target="_blank" class="navbar-text" href="/static/YunmarkChrome.crx">Chrome插件快速保存书签</a>
+                <a class="navbar-text navbar-right" href="#">{{ username }}</a>
+            </div>
+        </div>
+    </nav>
+    {% include 'markdown-help.html' %}
+    {% include 'announcement.html' %}
+    <div class="container">
+        <form name="todoForm" novalidate>
+            <!--onkeydown="if(event.keyCode==13){return false;}">-->
+
+
+            <div class="form-group">
+                <label>Tags.</label>
+
+                <div id="inputTag" class="form-group has-feedback">
+                    <span class="form-control-feedback fui-tag" style="line-height: 40px;"></span>
+                    <input class="tagsinput from-control" data-role="tagsinput" name="todoTags" ng-model="inputTagData"
+                           required>
+
+                </div>
+            </div>
+            <div class="form-group has-{{judgeInputStatus(todoForm.todoContent.$invalid)}}">
+                <label>Content.</label>
+
+                <div id="up" class="btn-group" style="margin: 15px;">
+                    <button class="btn btn-sm btn-info" ng-click="insertBold('todoTextarea')"><strong>B</strong>
+                    </button>
+                    <button class="btn btn-sm btn-info" ng-click="insertItalic('todoTextarea')"><em>I</em></button>
+                    <button class="btn btn-sm btn-info" ng-click="insertLink('todoTextarea')"><span
+                            class="fui-link"></span></button>
+                    <button class="btn btn-sm btn-info" ng-click="insertImage('todoTextarea')"><span
+                            class="fui-image"></span></button>
+                    <button class="btn btn-sm btn-info" ng-click="insertBullet('todoTextarea')"><span
+                            class="fui-list-bulleted"></span></button>
+                    <button class="btn btn-sm btn-info" ng-click="insertCode('todoTextarea')">Code</button>
+                    <button ng-if="!uploadurl" class="btn btn-sm btn-info btn-upload" id="pickfiles">
+                     <span
+                        class="fui-clip"></span>
+                    </button>
+
+                    <div id="uploading" class="spinner" style="display: none;">
+                        <div class="rect1"></div>
+                        <div class="rect2"></div>
+                        <div class="rect3"></div>
+                        <div class="rect4"></div>
+                        <div class="rect5"></div>
+                    </div>
+                </div>
+                <span style="display: none;">{{uploadurl}}</span>
+                <textarea class="form-control tabIndent" rows="5" name="todoContent" id="todoTextarea"
+                          ng-model="todoText"
+                          required ng-minlength=1 placeholder="输入内容..."></textarea>
+            </div>
+            <span ng-hide="1">{{listByTag}}</span>
+            <button class="btn btn-primary" type="submit"
+                    ng-disabled="todoForm.todoContent.$invalid" ng-click="addTodo()"
+                    style="width: 100px;">Add Mark
+            </button>
+
+
+        </form>
+
+
+    </div>
+
+
+    <div class="container" style="padding-top: 30px;">
+        <!--<div class="row">-->
+        <!--<div class="col-sm-6 col-md-6 col-sm-offset-3 col-md-offset-3">-->
+        <div class="input-group" style="margin-top:15px;margin-bottom: 15px;">
+            <span class="input-group-addon fui-search" ng-click="searchTags()"></span>
+            <select id="selectTags" multiple="multiple" class="form-control multiselect multiselect-info">
+            </select>
+            <!--<span class="input-group-addon" ng-click="searchTags()">搜索Tag</span>-->
+
+            <span class="input-group-addon" ng-click="arve()">定向发送</span>
+            <span class="input-group-addon fui-trash" ng-click="archive()"> <span class="navbar-new"
+                                                                                  ng-show="todos.length - remaining() > 0">{{todos.length - remaining()}}</span></span>
+        </div>
+        <table class="table table-hover container col-md-12 col-sm-12">
+            <caption>
+                共有{{todos.length}}个Mark
+            </caption>
+            <tr ng-repeat="todo in todos" ng-init="modify = 0;shareStatus = 0" class="container">
+                <td ng-show="modify == 0 && judgeTag()" class="col-md-10">
+                    <label class="checkbox done-{{todo.done}}" for="{{todo.hash}}+{{todo.text}}">
+                        <input type="checkbox" value="" id="{{todo.hash}}+{{todo.text}}" data-toggle="checkbox"
+                               class="custom-checkbox" ng-model="todo.done">
+                                <span class="icons" style="line-height:20px;">
+                                    <span class="icon-unchecked" style="line-height:20px;"></span>
+                                    <span class="icon-checked" style="line-height:20px;"></span>
+                                </span>
+
+                        <div ng-bind-html="todo.text"></div>
+                    </label>
+
+                </td>
+                <td ng-show="modify == 1" class="col-md-10">
+                    <form name="todoFormModify" novalidate>
+                        <div class="form-group">
+                            <label>Tags.</label>
+
+                            <div class="form-group has-feedback" id="{{todo.hash + 1}}">
+                                <span class="form-control-feedback fui-tag" style="line-height: 40px;"></span>
+                                <input class="form-control tagsinput" data-role="tagsinput" name="todoTags"
+                                       ng-model="todo.tag">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Content.
+                            </label>
+
+                            <div class="btn-group" style="margin: 15px;">
+                                <button class="btn btn-sm btn-info" ng-click="insertBold(todo.hash)"><strong>B</strong>
+                                </button>
+                                <button class="btn btn-sm btn-info" ng-click="insertItalic(todo.hash)"><em>I</em>
+                                </button>
+                                <button class="btn btn-sm btn-info" ng-click="insertLink(todo.hash)"><span
+                                        class="fui-link"></span></button>
+                                <button class="btn btn-sm btn-info" ng-click="insertImage(todo.hash)"><span
+                                        class="fui-image"></span></button>
+                                <button class="btn btn-sm btn-info" ng-click="insertBullet(todo.hash)"><span
+                                        class="fui-list-bulleted"></span></button>
+                                <button class="btn btn-sm btn-info" ng-click="insertCode(todo.hash)">Code</button>
+                            </div>
+
+                            <span style="display: none;">{{uploadurl}}</span>
+                            <textarea class="form-control tabIndent" rows="5" name="todoContentModify"
+                                      id="{{todo.hash}}"
+                                      ng-model="todo.original"
+                                      required ng-minlength=1></textarea>
+                        </div>
+
+                        <button class="btn btn-info" type="submit"
+                                ng-disabled="todoFormModify.todoContentModify.$invalid"
+                                ng-click="modifyTodo()"
+                                style="width: 100px;">Modify
+                        </button>
+
+                    </form>
+                </td>
+                <td ng-show="modify == 0 && judgeTag()" class="col-md-2">
+                    <div class="btn-group btn-group-xs" style="margin-top: 12px;">
+                    <button class="btn btn-sm btn-info" ng-show="modify == 0 && judgeTag()" ng-click="modifyContent()">修改</button>
+                    <button class='btn btn-sm btn-info' ng-show="modify == 0 && todo.shareStatus != 1" ng-click="shareContent()">Share</button>
+                    <button class='btn btn-sm btn-info' ng-show="modify == 0 && todo.shareStatus == 1" ng-click="unshareContent()">已分享</button>
+                    <button class='btn btn-sm btn-info' ng-show="modify == 0 && judgeTag()" ng-click="post_coding_pp()">发冒泡</button>
+
+                        </div>
+                </td>
+                <td ng-show="modify == 1" class="col-md-2">
+                    <button ng-click="cancelModify()" class="btn btn-sm btn-info"><span class="fui-cross"></span></button>
+                </td>
+            </tr>
+        </table>
+        <!--</div>-->
+        <!-- /.col-md-4 -->
+        <!--</div>-->
+        <!-- /.row -->
+    </div>
+
+
+    <!--<footer style="text-align: center;">{{clock|date:'medium'}}</footer>-->
+</div>
+<style>
+    img {
+        max-width: 100%
+    }
+
+    li,p {
+        font-size: 1em;
+    }
+    .col-md-1 {
+        text-align: center;
+    }
+
+</style>
+{% endblock %}

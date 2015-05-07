@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="container" style="background-color: rgb(245, 245, 245)">
+        <div class="row" style="padding-top: 6%">
+            <div class="container">
+                <h3>密码经过SHA1加密,直接发送到Coding</h3>
+                    <div class="form-group">
+                        <input type="text" class="form-control login-field" value="" placeholder="Coding用户名"
+                               required="required" id="username" name="username" ng-model="username"/>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="password" class="form-control login-field" value="" placeholder="Coding密码"
+                               required="required" id="password" name="password" ng-model="password"/>
+                    </div>
+                    {% if captcha %}
+                    <div class="form-group">
+                        <input type="text" class="form-control login-field" value="" placeholder="验证码"
+                               id="captcha" name="captcha"/>
+                    </div>
+                    {% endif %}
+                    {% if captcha %}
+                    <iframe id="iframe" src="/login_coding" height="70px" width="150px">
+                    </iframe>
+                    {% endif %}
+                    <button class="btn btn-primary btn-lg btn-block" id="login">登录</button>
+            </div>
+        </div>
+    </div>
+    <script src="../static/js/vendor/jquery.min.js"></script>
+    <script src="../static/sha1.js"></script>
+    <script>
+        $('#login').click(function () {
+            $.post('/login_coding_with_captcha', {
+                username: $('#username').val(),
+                password: hex_sha1($('#password').val()),
+                captcha: $('#captcha').val()
+            }, function (data) {
+                var obj = $.parseJSON(data);
+                if(obj.code == 0) {
+                    alert('成功登陆Coding,可以发冒泡了');
+                    window.history.back();
+                } else if(obj.code == 903) {
+                    alert(obj.msg.j_captcha_error);
+                    if($('#iframe').length > 0)
+                        $('#iframe').attr('src', $('#iframe').attr('src'));
+                    else
+                        window.location.reload();
+                } else if(obj.code == 1026) {
+                    alert(obj.msg.email);
+                } else if(obj.code == 1) {
+                    alert(obj.msg.email);
+                }
+            });
+        });
+    </script>
+    <style>
+    h3 {
+        text-align: center;
+    }
+    </style>
+{% endblock %}

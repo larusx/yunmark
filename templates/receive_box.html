@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="container" style="background-color: rgb(245, 245, 245);margin-top: 30px;" ng-app="myApp" ng-controller="ReceiveCtrl">
+    <p id="username" style="display: none;">{{ username }}</p>
+    <div ng-repeat="element in receiveContent" ng-init="receiveStatus = 0" ng-show="receiveStatus == 0" class="well" style="background-color: rgb(251,251,251);margin-top: 40px;margin-bottom: 40px;border: 1px solid #23BA98;">
+        <div>
+            <div ng-bind-html="element.text"></div>
+        </div>
+        <div class="pull-right" style="margin-top: -20px;margin-right: -15px">
+            <a href=""><span  class="label label-success" ng-click="receive()"
+                      style="line-height: 50px;margin-left: 10px;">接收</span></a>
+        </div>
+    </div>
+</div>
+<style>
+    img {
+        max-width: 100%;
+    }
+    p,li {
+        font-size: 1em;
+    }
+    blockquote p {
+        font-size: 0.75em;
+    }
+    pre code {
+        font-size: 0.9em;
+    }
+    ul,ol {
+        padding-left: 20px;
+    }
+    h1 {
+        font-size: 2em;
+    }
+    h2 {
+        font-size: 1.8em;
+    }
+    h3 {
+        font-size: 1.6em;
+    }
+    h4 {
+        font-size: 1.4em;
+    }
+    h5 {
+        font-size: 1.2em;
+    }
+    h6 {
+        font-size: 1.1em;
+    }
+</style>
+
+{% endblock %}

@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+{% block body %}
+<div ng-app="myApp" ng-controller="TodoCtrl" ng-init="listByTag=['all']" ng-cloak
+     style="background-color: rgb(245, 245, 245)" xmlns="http://www.w3.org/1999/html">
+    <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header" ng-init="Title='YunMark'">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-01">
+                    <span class="sr-only">Toggle navigation</span>
+                </button>
+                <a class="navbar-brand" href="/">{{Title}}</a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-collapse-01">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a class="navbar-text" data-toggle="modal" data-target="#markdown-help" href="#">Markdown手册
+                        </a></li>
+                    <li>
+                        <a class="navbar-text" data-toggle="modal" data-target="#announcement" href="#">介绍</a>
+                    </li>
+                    <li>
+                        <a class="navbar-text" href="/share">广场</a>
+                    </li>
+                    <li>
+                        <a class="navbar-text" target="_blank" href="https://coding.net/pp">coding冒泡</a>
+                    </li>
+                    <li>
+                        <a target="_blank" class="navbar-text" href="/static/YunmarkChrome.crx">Chrome插件快速保存书签</a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ username }}
+                            <span ng-show="unread_number > 0"class="navbar-unread"></span>
+                        </a>
+                        <span class="dropdown-arrow"></span>
+                        <ul class="dropdown-menu">
+                            <span ng-show="unread_number > 0" class="navbar-new">{{unread_number}}</span>
+                            <li><a id="vote" ng-click="vote()">支持一下</a></li>
+                            <li><a href="#" data-toggle="modal" data-target="#receive_box" >收件箱</a></li>
+                            <li class="divider"></li>
+                            <li><a href="/logout">退出</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="modal fade" id="receive_box" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel">收件箱</h4>
+      </div>
+      <div class="modal-body">
+          <div style="background-color: rgb(245, 245, 245);margin-top: 30px;">
+    <div ng-repeat="element in receive_content_list" ng-init="receiveStatus = 0" ng-show="receiveStatus == 0" class="well" style="background-color: rgb(251,251,251);margin-top: 40px;margin-bottom: 40px;border: 1px solid #23BA98;">
+        <div>
+            <div ng-bind-html="element.text"></div>
+        </div>
+        <div class="pull-right" style="margin-top: -20px;margin-right: -15px">
+            From {{element.from}}
+            <a href="javascript:void(0)">
+                <span  class="label label-success" ng-click="receive()"
+                      style="line-height: 40px;margin-left: 10px;">接收</span></a>
+            <a href="javascript:void(0)"><span  class="label label-danger" ng-click="delete_receive()"
+                       style="line-height: 40px;margin-left: 5px;">删除</span></a>
+        </div>
+    </div>
+</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+    {% include 'markdown-help.html' %}
+    {% include 'announcement.html' %}
+    <div class="container">
+        <form name="todoForm" novalidate>
+            <!--onkeydown="if(event.keyCode==13){return false;}">-->
+            <div class="form-group">
+                <label>可添加多个标签</label>
+                <div id="inputTag" class="form-group has-feedback">
+                    <span class="form-control-feedback fui-tag" style="line-height: 40px;"></span>
+                    <input class="tagsinput from-control" data-role="tagsinput" name="todoTags" ng-model="inputTagData"
+                           required>
+                </div>
+            </div>
+            <div class="form-group has-{{judgeInputStatus(todoForm.todoContent.$invalid)}}">
+                <label>Content.</label>
+                <div id="up" class="btn-group btn-group-xs" style="margin: 15px;">
+                    <button class="btn btn-xs btn-info" ng-click="insertBold('todoTextarea')"><strong>B</strong>
+                    </button>
+                    <button class="btn btn-xs btn-info" ng-click="insertItalic('todoTextarea')"><em>I</em></button>
+                    <button class="btn btn-xs btn-info" ng-click="insertLink('todoTextarea')"><span
+                            class="fui-link"></span></button>
+                    <button class="btn btn-xs btn-info" ng-click="insertImage('todoTextarea')"><span
+                            class="fui-image"></span></button>
+                    <button class="btn btn-xs btn-info" ng-click="insertBullet('todoTextarea')"><span
+                            class="fui-list-bulleted"></span></button>
+                    <button class="btn btn-xs btn-info" ng-click="insertCode('todoTextarea')">Code</button>
+                    <button ng-if="!uploadurl" class="btn btn-xs btn-info btn-upload" id="pickfiles">
+                        上传
+                    </button>
+                    <div class="progress" id="uploading_progress" style="width: 100px;display: none;">
+  <div class="progress-bar" id="uploading">
+  </div>
+</div>
+                </div>
+                <span style="display: none;">{{uploadurl}}</span>
+                <textarea class="form-control tabIndent" rows="5" name="todoContent" id="todoTextarea"
+                          ng-model="todoText"
+                          required ng-minlength=1 placeholder="输入内容..."></textarea>
+            </div>
+            <span ng-hide="1">{{listByTag}}</span>
+            <button class="btn btn-primary" type="submit"
+                    ng-disabled="todoForm.todoContent.$invalid" ng-click="addTodo()"
+                    style="width: 100px;">添加笔记
+            </button>
+        </form>
+    </div>
+    <div class="container" style="padding-top: 30px;">
+        <!--<div class="row">-->
+        <!--<div class="col-sm-6 col-md-6 col-sm-offset-3 col-md-offset-3">-->
+        <div class="input-group" style="margin-top:15px;margin-bottom: 15px;">
+            <span class="input-group-addon fui-search" ng-click="searchTags()"></span>
+            <select id="selectTags" multiple="multiple" class="form-control multiselect multiselect-info">
+            </select>
+            <!--<span class="input-group-addon" ng-click="searchTags()">搜索Tag</span>-->
+{#            <span class="input-group-addon" ng-click="arve()">定向发送</span>#}
+            <span class="input-group-addon fui-trash" ng-click="archive()"> <span class="navbar-new"
+                                                                                  ng-show="todos.length - remaining() > 0">{{todos.length - remaining()}}</span></span>
+        </div>
+            <h6 style="text-align: center;">
+                共有{{todos.length}}条记录
+            </h6>
+            <div ng-repeat="todo in todos" ng-init="modify = 0;shareStatus = 0;thisStyle = 'overflow: hidden;max-height: 100px;' " class="well" style="background-color: rgb(251,251,251);margin-top: 40px;margin-bottom: 40px;">
+                <div ng-show="modify == 0 && judgeTag()" style="{{thisStyle}}" ng-click="expand()">
+                        <div ng-bind-html="todo.text"></div>
+                    <span style="" ng-show="modify == 0 && todo.shareStatus == 1" class="label label-success">已分享</span>
+                </div>
+                <div ng-show="modify == 1" >
+                    <form name="todoFormModify" novalidate>
+                        <div class="form-group">
+                            <label>标签</label>
+                            <div class="form-group has-feedback" id="{{todo.hash + 1}}">
+                                <span class="form-control-feedback fui-tag" style="line-height: 40px;"></span>
+                                <input class="form-control tagsinput" data-role="tagsinput" name="todoTags"
+                                       ng-model="todo.tag">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Content.
+                            </label>
+                            <div class="btn-group btn-group-xs" style="margin: 15px;">
+                                <button class="btn btn-xs btn-info" ng-click="insertBold(todo.hash)"><strong>B</strong>
+                                </button>
+                                <button class="btn btn-xs btn-info" ng-click="insertItalic(todo.hash)"><em>I</em>
+                                </button>
+                                <button class="btn btn-xs btn-info" ng-click="insertLink(todo.hash)"><span
+                                        class="fui-link"></span></button>
+                                <button class="btn btn-xs btn-info" ng-click="insertImage(todo.hash)"><span
+                                        class="fui-image"></span></button>
+                                <button class="btn btn-xs btn-info" ng-click="insertBullet(todo.hash)"><span
+                                        class="fui-list-bulleted"></span></button>
+                                <button class="btn btn-xs btn-info" ng-click="insertCode(todo.hash)">Code</button>
+                            </div>
+                            <span style="display: none;">{{uploadurl}}</span>
+                            <textarea class="form-control tabIndent" rows="5" name="todoContentModify"
+                                      id="{{todo.hash}}"
+                                      ng-model="todo.original"
+                                      required ng-minlength=1></textarea>
+                        </div>
+                        <button class="btn btn-success btn-xs" type="submit"
+                                ng-disabled="todoFormModify.todoContentModify.$invalid"
+                                ng-click="modifyTodo()"
+                                style="width: 100px;">更改
+                        </button>
+                        <button class="btn btn-info btn-xs"
+                                ng-click="cancelModify()"
+                                style="width: 100px;">关闭
+                        </button>
+                    </form>
+                </div>
+                    <div ng-show="modify == 0 && judgeTag()" class="btn-group btn-group-xs pull-right" style="margin-top: -10px;margin-right: -15px;">
+                    <button class="btn btn-xs btn-info" ng-show="modify == 0 && judgeTag()" ng-click="modifyContent()">修改</button>
+                    <button class="btn btn-xs btn-info dropdown-toggle" type="button" data-toggle="dropdown">
+                        分享 <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu dropdown-menu-inverse" role="menu">
+                        <li><a href="" ng-show="modify == 0 && todo.shareStatus != 1" ng-click="shareContent()">站内分享</a></li>
+                        <li><a href="" ng-show="modify == 0 && todo.shareStatus == 1" ng-click="unshareContent()">取消分享</a></li>
+                        <li class="divider"></li>
+                        <li><a href="" ng-show="modify == 0 && judgeTag()" ng-click="post_coding_pp()">转发Coding冒泡</a></li>
+                        <li><a href="" data-toggle="modal" data-target="#{{todo.hash + 2}}">转发给用户</a></li>
+                      </ul>
+                        <button class="btn btn-xs btn-danger" ng-show="modify == 0 && judgeTag()" ng-click="deleteContent($index)">删除</button>
+                    </div>
+                <!-- Modal -->
+<div class="modal fade" id="{{todo.hash + 2}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel">请点击要发送的用户名</h4>
+      </div>
+      <div class="modal-body">
+          <table class="table table-hover">
+              <tr ng-repeat="user in user_list">
+                  <td>
+                      <a href="" ng-click="send_mark(user, todo)">{{user}}</a>
+                  </td>
+              </tr>
+          </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+            </div>
+        <!--</div>-->
+        <!-- /.col-md-4 -->
+        <!--</div>-->
+        <!-- /.row -->
+    </div>
+    <!--<footer style="text-align: center;">{{clock|date:'medium'}}</footer>-->
+</div>
+<style>
+    img {
+        max-width: 100%
+    }
+    li,p {
+        font-size: 1em;
+    }
+    blockquote p {
+        font-size: 0.75em;
+    }
+    pre code {
+        font-size: 0.9em;
+    }
+    ul,ol {
+        padding-left: 20px;
+    }
+    h1 {
+        font-size: 2em;
+    }
+    h2 {
+        font-size: 1.8em;
+    }
+    h3 {
+        font-size: 1.6em;
+    }
+    h4 {
+        font-size: 1.4em;
+    }
+    h5 {
+        font-size: 1.2em;
+    }
+    h6 {
+        font-size: 1.1em;
+    }
+</style>
+{% endblock %}

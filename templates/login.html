@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block body %}
+<div ng-app="myApp" ng-controller="RegisterCtrl" ng-init="register_status = -1;login_status = 0;"
+     style="height:512px;background-color: #1abc9c" ng-cloak xmlns="http://www.w3.org/1999/html">
+    <div class="container">
+        <div class="row" style="padding-top: 10%">
+            <div class="col-md-3 col-md-offset-2">
+                <img src="../static/img/icons/svg/book.svg" alt="TODO LIST" style="margin-bottom: 50px;"/>
+                <!--<h4>Welcome to<br>-->
+                <!--<small></small>-->
+                <!--</h4>-->
+            </div>
+            <div class="container">
+                <form ng-show="login_status == 0" class="login-form col-md-4" action="/login" ng-submit="md5_this()"
+                      method="post">
+                    <div class="form-group">
+                        <input type="text" class="form-control login-field" value="" placeholder="账号"
+                               id="login-name" name="username" ng-model="username"/>
+                        <label class="login-field-icon fui-user" for="login-name"></label>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="password" class="form-control login-field" value="" placeholder="密码"
+                               id="login-pass" name="password" ng-model="password"/>
+                        <label class="login-field-icon fui-lock" for="login-pass"></label>
+                    </div>
+
+                    <input type="submit" class="btn btn-success btn-lg btn-block" value="登陆">
+
+                    <button class="btn btn-primary btn-lg btn-block" ng-click="register()">输入账号和密码后点我注册</button>
+                    <p style="text-align: center;margin-bottom: 5px;margin-top: 5px;">或者可以选择</p>
+                    <div id="wb_connect_btn"></div>
+                    <div class="form-group" ng-if="register_status == 0" ng-cloak>
+                        <p>注册成功，请登录</p>
+                    </div>
+                    <div class="form-group" ng-if="register_status == 1" ng-cloak>
+                        <p>用户已存在</p>
+                    </div>
+                    <div class="form-group" ng-if="register_status == 2" ng-cloak>
+                        <p>请输入用户名和密码，点击注册</p>
+                    </div>
+                    <div class="form-group" ng-if="{{ wrongPassword }} == 1" ng-cloak>
+                        <p>密码错误请纠正</p>
+                    </div>
+                </form>
+            </div>
+            <div ng-show="login_status == 1" class="spinner">
+                <div class="rect1"></div>
+                <div class="rect2"></div>
+                <div class="rect3"></div>
+                <div class="rect4"></div>
+                <div class="rect5"></div>
+            </div>
+        </div>
+    </div>
+    <div class="container announcement col-md-6 col-md-offset-3" style="margin-top: 100px;" ng-bind-html="announcement">
+    </div>
+</div>
+
+<style>
+    .announcement p {
+        margin-left: 40px;
+    }
+    img {
+        max-width: 40%;
+    }
+    a>img {
+        max-width: 100%;
+    }
+    .WB_loginButton {
+        margin-left: 20%;
+    }
+</style>
+{% endblock %}

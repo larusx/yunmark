@@ -1,0 +1,21 @@
+
+name: queue
+version: 1
+
+worker: gevent
+
+libraries:
+- name: "flask"
+  version: "0.10"
+- name: "lxml"
+  version: "2.3.4"
+- name: "gevent"
+  version: "1.0"
+- name: "markdown"
+  version: "2.5.2"
+- name: "misaka"
+  version: "1.0.2"
+handlers:
+- url: /static/
+  static_path: static
+  gzip: on

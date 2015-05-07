@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block body %}
+    <div class="col-md-12" style="background-color:#23BA98;">
+    <div class="col-md-6 col-md-offset-3" style="margin-top: 50px;margin-bottom:50px;background-color: white;border: 3px solid #ffffff;border-radius: 5px;">
+        <p style="text-align: center;font-size: large;margin-top: 30px;margin-bottom: 30px;font-weight: 200;">用户的分享</p>
+        <table class="table table-hover">
+            {% for element in users %}
+                <tr>
+                    <td>
+                        <a href="/share/{{ element.name }}">{{ element.name }}</a>
+                    </td>
+                    <td>
+                        共{{ element.count }}项
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+     </div>
+    </div>
+    <style>img {
+        max-width: 100%;
+    }
+
+    td {
+        text-align: center;
+    }
+    .table {
+        max-width: 512px;
+        margin-left: auto;
+        margin-right: auto;
+
+    }
+    a,td {
+        font-size: 1em;
+
+
+    }
+    .table-hover{
+     background-color: #ffffff;
+    }
+    </style>
+
+{% endblock %}>

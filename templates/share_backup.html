@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="container" style="background-color: rgb(245, 245, 245);margin-top: 30px;" ng-app="myApp" ng-controller="ShareCtrl">
+    <h4 style="text-align: center;">{{ username }}分享的Mark</h4>
+    <p id="username" style="display: none;">{{ username }}</p>
+    <p style="text-align: center;">请点击Mark来添加到自己的笔记中</p>
+    <table class="table table-hover">
+        <tr ng-repeat="element in shareContent" ng-init="markStatus = 0">
+            <td class="col-md-11">
+                <p id="{{element.index}}"style="display: none;">{{element.original}}</p>
+                <div ng-bind-html="element.text"></div>
+            </td>
+            <td class="col-md-1">
+                <span ng-show="markStatus == 0" class="label label-success" ng-click="markShare()"
+                          style="line-height: 50px;margin-left: 10px;">Mark</span>
+                <span ng-show="markStatus == 1" class="fui-check" style="line-height: 50px;margin-left: 10px;"></span>
+            </td>
+        </tr>
+    </table>
+</div>
+<style>
+    img {
+        max-width: 100%;
+    }
+    p,li {
+        font-size: 1em;
+    }
+</style>
+
+{% endblock %}
+

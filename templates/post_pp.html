@@ -1,0 +1,22 @@
+<html>
+<head>
+
+</head>
+<body>
+<div id="post_pp_div">
+    <textarea id="post_pp_text"></textarea>
+    <button id="post_pp">发泡泡</button>
+</div>
+<script src="../static/js/vendor/jquery.min.js"></script>
+<script>
+    $('#post_pp').click(function () {
+        $.post('/post_coding_pp', {
+            text: $('#post_pp_text').val()
+        }, function (data) {
+            alert(data);
+        });
+    });
+</script>
+</body>
+</html>
+
