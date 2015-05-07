@@ -9,10 +9,10 @@ class DataBase(object):
         self.share_content_key = username + '_share_content'
         self.share_hash_key = username + '_share_hash'
         if 'debug' not in os.environ:
-            self.kv = redis.Redis(host=os.getenv('REDIS_PORT_6379_TCP_ADDR', 'localhost'),
-                                  port=int(os.getenv('REDIS_PORT_6379_TCP_PORT', '6379')),
+            self.kv = redis.Redis(host=os.getenv('YUNMARK-REDIS_PORT_6379_TCP_ADDR', 'localhost'),
+                                  port=int(os.getenv('YUNMARK-REDIS_PORT_6379_TCP_PORT', '6379')),
                                   db=0,
-                                  password=os.getenv('REDIS_PASSWORD', ''))
+                                  password=os.getenv('YUNMARK-REDIS_PASSWORD', ''))
         else:
             self.kv = redis.Redis(host='localhost', port=6379, db=0)
         self.username = username
