@@ -422,7 +422,7 @@ def transfer_from_tk():
 
 
 if __name__ == "__main__":
-    os.environ['sae.storage.path'] = './storage'
-    os.environ['HTTP_HOST'] = 'queue'
-    os.environ['debug'] = 'local'
-    app.run()
+    # os.environ['sae.storage.path'] = './storage'
+    # os.environ['HTTP_HOST'] = 'queue'
+    # os.environ['debug'] = 'local'
+    app.run('0.0.0.0', port=3000)
