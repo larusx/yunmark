@@ -1,5 +1,5 @@
 enum==0.4.4
-Flask==0.10.1
+Flask==1.0
 Flask-Redis==0.0.6
 gevent==1.0.1
 greenlet==0.4.3
