@@ -2,6 +2,7 @@
 from flask import Flask
 import os
 
+
 app = Flask(__name__)
 ADMINS = ['larusx@163.com']
 app.debug = True
