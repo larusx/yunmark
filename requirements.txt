@@ -5,7 +5,7 @@ gevent==1.0.1
 greenlet==0.4.3
 grizzled-python==1.0.1
 itsdangerous==0.24
-Jinja2==2.7.3
+Jinja2==2.11.3
 lxml==3.3.5
 Markdown==2.5.2
 MarkupSafe==0.23
