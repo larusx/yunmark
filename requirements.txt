@@ -6,7 +6,7 @@ greenlet==0.4.3
 grizzled-python==1.0.1
 itsdangerous==0.24
 Jinja2==2.7.3
-lxml==3.3.5
+lxml==4.9.1
 Markdown==2.5.2
 MarkupSafe==0.23
 misaka==1.0.2
